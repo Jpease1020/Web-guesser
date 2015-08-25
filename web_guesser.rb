@@ -1,64 +1,59 @@
 require 'sinatra'
 require 'sinatra/reloader'
 
-NUMBER = rand(101)
+
+@@number = rand(100)
 @@counter = 5
 
 get '/' do
   user_guess = params[:guess].to_i
   cheat      = params[:cheat]
-  message = check_guess(user_guess, NUMBER, cheat = nil)
-  erb :index, locals: { :number => NUMBER,
+  message    = check_guess(user_guess, cheat)
+  erb :index, locals: { :number => @number,
                         :message => message,
-                        :color => @color
-                      }
+                        :color => @color }
 end
 
-def check_guess(user_guess, number, cheat)
+def check_guess(user_guess, cheat)
   if cheat == "true"
-    "Here's the secret number you dirty cheater! #{number}"
-  elsif @@counter == 0
-    restart
-  elsif
-    guess_actions(user_guess, number)
+    "Here is the number you dirty cheater #{@@number}"
+  else
+
+    guess_actions(user_guess)
   end
 end
 
-def guess_actions(user_guess, number)
-   if user_guess == 0
-       @color = '#FFFFFF'
-       "You have #{@@counter} guesses left. Take a Guess!"
-   elsif user_guess > number + 5
-       @@counter -= 1
-       @color = '#FF0000'
-       "Way too high!  You have #{@@counter} guesses left "
-   elsif user_guess > number
-       @@counter -= 1
-       @color = "#FF9090"
-      "Too high. You have #{@@counter} guesses left"
-   elsif user_guess < number - 5
-       @@counter -= 1
-       @color = '#FF0000'
-       "Way too low! You have #{@@counter} guesses left"
-   elsif user_guess < number
-       @@counter -= 1
-       @color = "#FF9090"
-       "Too low. You have #{@@counter} guesses left"
-   elsif user_guess == number
-      @color = "#00FF00"
-      new_game
-      "The SECRET NUMBER is #{number} You got it right! A new game has begun, have fun playing! "
-   end
-end
-
-def new_game
-  @@counter = 5
-  NUMBER
-end
-
-def restart
-  @color = '#FFFFFF'
-  @@counter = 5
-  NUMBER
-  "You've lost, a new number will be generated and the game will start over."
+def guess_actions(user_guess)
+  number = @@number
+  if @@counter == 0
+    @color = '#FFFFFF'
+    @@counter = 5
+    @@number = rand(100)
+    "You've lost, a new number will be generated and the game will start over."
+  elsif user_guess == 0
+    @@counter -= 1
+    @color = '#FFFFFF'
+    "You have #{@@counter + 1} guesses left. Take a Guess!"
+  elsif user_guess > number + 5
+    @@counter -= 1
+    @color = '#FF0000'
+    "Way too high!  You have #{@@counter + 1} guesses left "
+  elsif user_guess > number
+    @@counter -= 1
+    @color = "#FF9090"
+    "Too high. You have #{@@counter + 1} guesses left"
+  elsif user_guess < number - 5
+    @@counter -= 1
+    @color = '#FF0000'
+    "Way too low! You have #{@@counter + 1} guesses left"
+  elsif user_guess < number
+    @@counter -= 1
+    @color = "#FF9090"
+    "Too low. You have #{@@counter + 1} guesses left"
+  elsif user_guess == number
+    @color = "#00FF00"
+    @@counter = 5
+    @@number = rand(100)
+    "The SECRET NUMBER is #{number} You got it right! A new game has begun, have fun playing! "
+  end
 end
